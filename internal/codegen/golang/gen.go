@@ -167,6 +167,15 @@ func generate(req *plugin.GenerateRequest, options *opts.Options, enums []Enum, 
 		Structs: structs,
 	}
 
+	for i, query := range queries {
+		override := query.Ret.Struct.Override
+		if override != nil {
+			split := strings.Split(*override, "/")
+			query.Ret.Struct.Name = split[len(split)-1]
+		}
+		queries[i] = query
+	}
+
 	tctx := tmplCtx{
 		EmitInterface:             options.EmitInterface,
 		EmitJSONTags:              options.EmitJsonTags,
