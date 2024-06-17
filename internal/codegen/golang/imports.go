@@ -108,7 +108,7 @@ func (i *importer) Imports(filename string) [][]ImportSpec {
 	case modelsFileName:
 		return mergeImports(i.modelImports())
 	case querierFileName:
-		return mergeImports(i.interfaceImports())
+		return mergeImports(i.interfaceImports(), i.overrideModelImports())
 	case copyfromFileName:
 		return mergeImports(i.copyfromImports())
 	case batchFileName:
@@ -280,6 +280,22 @@ func (i *importer) modelImports() fileImports {
 	}
 
 	return sortedImports(std, pkg)
+}
+
+func (i *importer) overrideModelImports() fileImports {
+	overrideModels := make([]string, 0, len(i.Queries))
+	for _, query := range i.Queries {
+		if query.Ret.Struct.Override != nil {
+			overrideModels = append(overrideModels, *query.Ret.Struct.Override)
+		}
+	}
+	pkg := make(map[ImportSpec]struct{}, len(overrideModels))
+	for _, model := range overrideModels {
+		split := strings.Split(model, ".")
+		path := strings.Join(split[:len(split)-1], ".")
+		pkg[ImportSpec{Path: path}] = struct{}{}
+	}
+	return sortedImports(make(map[string]struct{}), pkg)
 }
 
 func sortedImports(std map[string]struct{}, pkg map[ImportSpec]struct{}) fileImports {

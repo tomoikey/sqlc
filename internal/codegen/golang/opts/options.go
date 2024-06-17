@@ -44,6 +44,7 @@ type Options struct {
 	OmitUnusedStructs           bool              `json:"omit_unused_structs,omitempty" yaml:"omit_unused_structs"`
 	BuildTags                   string            `json:"build_tags,omitempty" yaml:"build_tags"`
 	Initialisms                 *[]string         `json:"initialisms,omitempty" yaml:"initialisms"`
+	OverrideRowType             map[string]string `json:"override_row_type,omitempty" yaml:"override_row_type"`
 
 	InitialismsMap map[string]struct{} `json:"-" yaml:"-"`
 }

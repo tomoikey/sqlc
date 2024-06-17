@@ -277,6 +277,7 @@ func buildQueries(req *plugin.GenerateRequest, options *opts.Options, structs []
 		} else if putOutColumns(query) {
 			var gs *Struct
 			var emit bool
+			var override *string
 
 			for _, s := range structs {
 				if len(s.Fields) != len(query.Columns) {
@@ -313,7 +314,18 @@ func buildQueries(req *plugin.GenerateRequest, options *opts.Options, structs []
 					return nil, err
 				}
 				emit = true
+
+				for k, v := range options.OverrideRowType {
+					if gq.MethodName == k {
+						emit = false
+						override = &v
+						break
+					}
+				}
 			}
+
+			gs.Override = override
+
 			gq.Ret = QueryValue{
 				Emit:        emit,
 				Name:        "i",
